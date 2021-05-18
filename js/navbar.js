@@ -12,7 +12,8 @@ document.getElementById("navMenu").innerHTML =
     '<li><a href="firewall.html"><i class="fa fa-warning fa-fw"></i> Firewall</a></li>'+
     '<li><a href="acl.html"><i class="fa fa-warning fa-fw"></i> Access Control Lists</a></li>'+
     '<li><a href="statistics.html"><i class="fa fa-bar-chart-o fa-fw"></i> Statistics</a></li>'+
-    '<li><a data-toggle="modal" href="#login-modal"><i class="fa fa-sign-out"></i> Change Controllers</a></li>'+
+    '<li><a data-toggle="modal" href="#login-modal"><i class="fa fa-sign-out"></i> Change Controllers123</a></li>'+
+    '<li><a href="loadbalancer.html" href="#login-modal"><i class="fa fa-expand"></i> Load Balancer</a></li>'+
     '</ul>';
 
 var ipaddress = $.cookie('cip');
