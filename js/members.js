@@ -8,7 +8,13 @@ $(document).ready(function() {
         " <h3  class='page-header'>Pool #" + getId() + " Members</h3>"
     );
     loadMembers();
+    startRefresh();
 });
+
+function startRefresh() {
+    setTimeout(startRefresh, 15000);
+    membersTable.ajax.reload();
+}
 
 function getId() {
     let url = window.location.href;
@@ -75,13 +81,13 @@ function loadMembers() {
             { data: "status" },
             { data: "weight" },
             { data: "flows" },
-            { data: "bytesIn" }
+            { data: "bytesIn" },
         ],
     });
 }
 
 function deleteMember(memberid) {
-    console.log(memberid)
+    console.log(memberid);
     $.ajax({
         type: "DELETE",
         dataType: "json",
@@ -94,6 +100,11 @@ function deleteMember(memberid) {
             "/",
         success: function(data) {
             loadMembers();
+            new PNotify({
+                title: "Member " + memberid + " deleted!",
+                type: "success",
+                hide: true,
+            });
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert(

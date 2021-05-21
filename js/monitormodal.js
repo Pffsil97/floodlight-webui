@@ -1,18 +1,20 @@
 function validateIPaddress(ipaddress) {
-    if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {
-        return (true)
+    if (
+        /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+            ipaddress
+        )
+    ) {
+        return true;
     }
-    return (false)
+    return false;
 }
 
 $("#btnAddMonitor").on("click", () => {
     console.log("click");
     var type = "";
 
-    if ($("#tcptype").prop("checked")) {
+    if ($("#a").prop("checked")) {
         type = "tcp";
-    } else if ($("#udptype").prop("checked")) {
-        type = "udp";
     } else type = "icmp";
 
     var id = $("#monitor-id").val();
@@ -30,9 +32,11 @@ $("#btnAddMonitor").on("click", () => {
     console.log(data);
 
     if (validateIPaddress(address)) {
-        console.log("aaabbbb")
+        console.log("aaabbbb");
         $.ajax({
-            url: "http://localhost:8080/quantum/v1.0/pools/" + pool_id + "/health_monitors/",
+            url: "http://localhost:8080/quantum/v1.0/pools/" +
+                pool_id +
+                "/health_monitors/",
             type: "post",
             dataType: "json",
             data: JSON.stringify(data),
@@ -42,19 +46,21 @@ $("#btnAddMonitor").on("click", () => {
                 protocol = "";
                 name = $("#monitor-name").val("");
                 address = $("#monitor-ip").val("");
-                pool_id = $("#pool").val("")
-                $("#tcptype").prop("checked", false);
-                $("#udptype").prop("checked", false);
-                $("#icmptype").prop("checked", false);
+                pool_id = $("#pool").val("");
+                $("#a").prop("checked", false);
+                $("#b").prop("checked", false);
                 $("#addMonitorModal").modal("toggle");
             },
         });
     } else {
-        console.log("falhou")
-        $("#monitoriperror").append("<div class='alert alert-danger' role='alert'>Invalid IP address!</div>")
-        setTimeout(function() { $("#monitoriperror").html("") }, 6000);
+        console.log("falhou");
+        $("#monitoriperror").append(
+            "<div class='alert alert-danger' role='alert'>Invalid IP address!</div>"
+        );
+        setTimeout(function() {
+            $("#monitoriperror").html("");
+        }, 6000);
     }
-
 });
 $("#tcp").on("click", () => {
     console.log("tcp");

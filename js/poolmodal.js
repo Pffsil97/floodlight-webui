@@ -6,6 +6,8 @@ $("#btnAddPool").on("click", () => {
     if ($("#rr").is(":checked")) lb_method = "rr";
     else if ($("#wrr").is(":checked")) lb_method = "wrr";
     else if ($("#statistics").is(":checked")) lb_method = "statistics";
+    else if ($("#llm").is(":checked")) lb_method = "llm";
+    else if ($("#ltp").is(":checked")) lb_method = "ltp";
     else lb_method = "slp";
 
     if ($("#tcptype").prop("checked")) {
@@ -42,6 +44,7 @@ $("#btnAddPool").on("click", () => {
             lb_method = " ";
             name = $("#pool-name").val("");
             timeout = $("#pool-timeout").val("");
+            vip_id = $("#vip").val("");
             $("#tcptype").prop("checked", false);
             $("#udptype").prop("checked", false);
             $("#icmptype").prop("checked", false);
@@ -49,6 +52,8 @@ $("#btnAddPool").on("click", () => {
             $("#wrr").prop("checked", false);
             $("#statistics").prop("checked", false);
             $("#slp").prop("checked", false);
+            $("#llm").prop("checked", false);
+            $("#ltp").prop("checked", false);
             $("#closeModal").click();
         },
         error: (error) => {

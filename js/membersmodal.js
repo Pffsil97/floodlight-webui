@@ -1,9 +1,36 @@
+function checkWRR(poolid) {
+    $.ajax({
+        type: "GET",
+        url: "http://localhost:8080/quantum/v1.0/pools/" + poolid + "/",
+
+        success: (response) => {
+            console.log(response);
+            if (response[0].lbMethod === "Weighted Round-Robin") {
+                console.log("WRR");
+                $("#memberweight").append(
+                    "<label>Weight</label><input class='form-control' type='text' id='member-weight' placeholder='Pool Member Weight' />"
+                );
+            }
+        },
+        error: (error) => {
+            console.log(error);
+        },
+    });
+}
+
+$(document).ready(function() {
+    console.log("READDY");
+    let pool_id = getId();
+    checkWRR(pool_id);
+
+    console.log("POOL ID", pool_id);
+});
 $("#btnAddMember").on("click", () => {
-    console.log(id)
     var id = $("#member-id").val();
     var address = $("#member-ip").val();
     var port = $("#member-port").val();
-    let pool_id = getId()
+    let pool_id = getId();
+    checkWRR(pool_id);
     var weight = $("#member-weight").val();
 
     let data = {
@@ -11,7 +38,7 @@ $("#btnAddMember").on("click", () => {
         address,
         port,
         pool_id,
-        weight
+        weight,
     };
     console.log(JSON.stringify(data));
 
@@ -25,7 +52,7 @@ $("#btnAddMember").on("click", () => {
             id = $("#member-id").val("");
             address = $("#member-id").val("");
             port = $("#member-port").val("");
-            pool_id = ""
+            pool_id = "";
             $("#closeModal").click();
         },
         error: (error) => {
@@ -35,7 +62,7 @@ $("#btnAddMember").on("click", () => {
 });
 
 function getId() {
-    let id = ""
+    let id = "";
     let url = window.location.href;
     for (let i = url.length - 1; i >= 0; i--) {
         if (url[i] !== "=") {

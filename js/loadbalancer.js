@@ -151,12 +151,33 @@ function loadMonitors() {
         },
         columnDefs: [{
                 render: function(data, type, row) {
-
-                    return (
-                        "<a id='monitorstate' class='btn btn-md btn-primary' onclick='toggleMonitorState(" +
-                        row.id +
-                        ")'>Enable</<a>"
-                    );
+                    if (
+                        row.type === "TCP" &&
+                        (row.status === "0" || row.status === "-1")
+                    ) {
+                        return (
+                            "<a id='monitorstate' class='btn btn-md btn-primary' onclick='toggleMonitorState(" +
+                            row.id +
+                            0 +
+                            row.poolId +
+                            ")'>Disabled</<a>"
+                        );
+                    } else if (row.type === "TCP" && row.status === "1") {
+                        return (
+                            "<a id='monitorstate' class='btn btn-md btn-primary' onclick='toggleMonitorState(" +
+                            row.id +
+                            0 +
+                            row.poolId +
+                            ")'>Enabled</<a>"
+                        );
+                    } else if (
+                        row.type === "ICMP" &&
+                        (row.status === "0" || row.status === "-1")
+                    ) {
+                        return "<p>Disabled</<p>";
+                    } else {
+                        return "<p>Enabled</<p>";
+                    }
                 },
                 targets: 5,
             },
@@ -194,6 +215,12 @@ function deleteVIP(vipid) {
             "/",
         success: function(data) {
             loadVIPS();
+
+            new PNotify({
+                title: "VIP " + vipid + " deleted!",
+                type: "success",
+                hide: true,
+            });
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert(
@@ -222,6 +249,11 @@ function deletePool(poolid) {
             "/",
         success: function(data) {
             loadPools();
+            new PNotify({
+                title: "Pool " + poolid + " deleted!",
+                type: "success",
+                hide: true,
+            });
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert(
@@ -250,28 +282,235 @@ function deleteMonitor(monitorid) {
             "/",
         success: function(data) {
             loadMonitors();
+
+            new PNotify({
+                title: "Health monitor " + monitorid + " deleted!",
+                type: "success",
+                hide: true,
+            });
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert(
-                "Error: " +
-                " " +
-                jqXHR.responseText +
-                " \n Status: " +
-                textStatus +
-                " \n Error Thrown: " +
-                errorThrown
-            );
+        error: function(error) {
+            loadMonitors();
+
+            new PNotify({
+                title: "Health monitor " + monitorid + " deleted!",
+                type: "success",
+                hide: true,
+            });
         },
     });
 }
 
-function toggleMonitorState(monitorid) {
-    console.log(monitorid);
+function toggleMonitorState(id) {
+    let { monitorid, poolid } = parseId(id);
+
     let state = $("#monitorstate").html();
 
-    if (state.indexOf("Enable") !== -1) {
-        $("#monitorstate").html("Disable");
+    if (state.indexOf("Disabled") !== -1) {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://" +
+                ipaddress +
+                ":" +
+                restport +
+                "/quantum/v1.0/pools/" +
+                poolid +
+                "/health_monitors/" +
+                monitorid +
+                "/enable/",
+            success: function(data) {
+                loadMonitors();
+
+                new PNotify({
+                    title: "Health monitor " + monitorid + " enabled!",
+                    type: "success",
+                    hide: true,
+                });
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert(
+                    "Error: " +
+                    " " +
+                    jqXHR.responseText +
+                    " \n Status: " +
+                    textStatus +
+                    " \n Error Thrown: " +
+                    errorThrown
+                );
+            },
+        });
     } else {
-        $("#monitorstate").html("Enable");
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://" +
+                ipaddress +
+                ":" +
+                restport +
+                "/quantum/v1.0/pools/" +
+                poolid +
+                "/health_monitors/" +
+                monitorid +
+                "/disable/",
+            success: function(data) {
+                loadMonitors();
+
+                new PNotify({
+                    title: "Health monitor " + monitorid + " disabled!",
+                    type: "success",
+                    hide: true,
+                });
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert(
+                    "Error: " +
+                    " " +
+                    jqXHR.responseText +
+                    " \n Status: " +
+                    textStatus +
+                    " \n Error Thrown: " +
+                    errorThrown
+                );
+            },
+        });
     }
+}
+
+function parseId(id) {
+    //101
+    let stringid = id.toString();
+
+    var index = stringid.indexOf("0"); // Gets the first index where a space occours
+    var monitorid = stringid.substr(0, index); // Gets the first part
+    var poolid = stringid.substr(index + 1);
+    console.log("monitor", monitorid);
+    console.log("pool", poolid);
+    return { monitorid, poolid };
+}
+
+$("#toggleAllMonitors").on("click", () => {
+    let state = $("#toggleAllMonitors").html();
+    if (state.indexOf("Enable ICMP Monitors") !== -1) {
+        monitorsTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
+            var data = this.data();
+            console.log(data);
+            if (data.type === "ICMP") {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "http://" +
+                        ipaddress +
+                        ":" +
+                        restport +
+                        "/quantum/v1.0/pools/" +
+                        data.poolId +
+                        "/health_monitors/" +
+                        data.id +
+                        "/enable/",
+                    success: function(response) {
+                        loadMonitors();
+                        $("#toggleAllMonitors").html("Disable ICMP Monitors");
+                        new PNotify({
+                            title: "Health monitor " + data.id + " enabled!",
+                            type: "success",
+                            hide: true,
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert(
+                            "Error: " +
+                            " " +
+                            jqXHR.responseText +
+                            " \n Status: " +
+                            textStatus +
+                            " \n Error Thrown: " +
+                            errorThrown
+                        );
+                    },
+                });
+            }
+        });
+    } else {
+        monitorsTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
+            var data = this.data();
+            if (data.type === "ICMP") {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "http://" +
+                        ipaddress +
+                        ":" +
+                        restport +
+                        "/quantum/v1.0/pools/" +
+                        data.poolId +
+                        "/health_monitors/" +
+                        data.id +
+                        "/disable/",
+                    success: function(response) {
+                        loadMonitors();
+                        $("#toggleAllMonitors").html("Enable All");
+                        new PNotify({
+                            title: "Health monitor " + data.id + " disabled!",
+                            type: "success",
+                            hide: true,
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert(
+                            "Error: " +
+                            " " +
+                            jqXHR.responseText +
+                            " \n Status: " +
+                            textStatus +
+                            " \n Error Thrown: " +
+                            errorThrown
+                        );
+                    },
+                });
+            }
+        });
+    }
+});
+
+function toggleAllMonitors() {
+    console.log("CLIIIIICK");
+    monitorsTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
+        var data = this.data();
+        if (data.type === "ICMP") {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "http://" +
+                    ipaddress +
+                    ":" +
+                    restport +
+                    "/quantum/v1.0/pools/" +
+                    poolid +
+                    "/health_monitors/" +
+                    monitorid +
+                    "/enable/",
+                success: function(data) {
+                    loadMonitors();
+
+                    new PNotify({
+                        title: "Health monitor " + monitorid + " disabled!",
+                        type: "success",
+                        hide: true,
+                    });
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert(
+                        "Error: " +
+                        " " +
+                        jqXHR.responseText +
+                        " \n Status: " +
+                        textStatus +
+                        " \n Error Thrown: " +
+                        errorThrown
+                    );
+                },
+            });
+        }
+    });
 }

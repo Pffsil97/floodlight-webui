@@ -20,6 +20,9 @@
     <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
     <!-- Custom Fonts -->
     <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link href="../bower_components/pnotify/css/pnotify.css" rel="stylesheet" />
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -159,7 +162,7 @@
                                     <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" id="deleteAllMonitors">Delete All</a>
                                 </div>
                                 <div class="col-md-1">
-                                    <a href="#" class="btn btn-sm btn-info" data-toggle="modal" id="deleteAllMonitors">Enable All</a>
+                                    <a href="#" class="btn btn-sm btn-info" data-toggle="modal" id="toggleAllMonitors">Enable ICMP Monitors</a>
                                 </div>
                                 <br/><br/>
                             </div>
@@ -202,6 +205,8 @@
     </div>
     <!-- /#wrapper -->
     <!-- jQuery -->
+
+
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap Core JavaScript -->
     <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -216,6 +221,9 @@
 
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script src="../js/querystringparser.js"></script>
+    <script src="../bower_components/pnotify/pnotify.buttons.js"></script>
+    <script src="../bower_components/pnotify/pnotify.core.js"></script>
+    <script src="../bower_components/pnotify/pnotify.nonblock.js"></script>
 
     <!-- Custom scripts to load in HTML -->
     <script src="../js/navbar.js"></script>
